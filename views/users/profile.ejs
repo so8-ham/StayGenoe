@@ -1,0 +1,81 @@
+<% layout('layouts/boilerplate') %>
+    <div class="row mt-3">
+        <div class="col-8 offset-2">
+            <div class="card glass-card mb-4">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-3">My Profile</h2>
+
+                    <div class="position-relative d-inline-block mb-3">
+                        <img src="<%= user.image && user.image.url ? user.image.url : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' %>"
+                            alt="Profile" class="rounded-circle border"
+                            style="width: 150px; height: 150px; object-fit: cover;">
+                    </div>
+
+                    <form action="/profile/image" method="POST" enctype="multipart/form-data" class="mb-3">
+                        <div class="input-group mb-3 w-50 mx-auto">
+                            <input type="file" class="form-control" name="user[image]" id="profileImage" required>
+                            <button class="btn btn-outline-primary" type="submit">Update Photo</button>
+                        </div>
+                    </form>
+
+                    <h4>
+                        <%= user.username %>
+                    </h4>
+                    <p class="text-muted">
+                        <%= user.email %>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h3 class="mb-3">My Listings</h3>
+            <% if(listings.length> 0) { %>
+                <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+                    <% for(let listing of listings) { %>
+                        <div class="col mb-4">
+                            <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+                                <div class="card listing-card h-100">
+                                    <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>"
+                                        style="height: 15rem; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <%= listing.title %>
+                                        </h5>
+                                        <p class="price-text">&#8377; <%= listing.price.toLocaleString("en-IN") %> /
+                                                night</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <% } %>
+                </div>
+                <% } else { %>
+                    <p class="text-muted">You haven't created any listings yet.</p>
+                    <% } %>
+
+                        <hr>
+
+                        <h3 class="mb-3">My Reviews</h3>
+                        <% if(reviews.length> 0) { %>
+                            <div class="row">
+                                <% for(let review of reviews) { %>
+                                    <div class="card col-12 mb-3 p-3 review-card glass-card">
+                                        <div class="card-body">
+                                            <p class="starability-result card-text" data-rating="<%= review.rating %>">
+                                            </p>
+                                            <p class="card-text">
+                                                <%= review.comment %>
+                                            </p>
+                                            <small class="text-muted">Posted on listing ID: <%= review.listing ?
+                                                    review.listing : 'Unknown' %></small>
+                                            <!-- Note: Review model does not strictly link back to listing in schema provided, assuming simple display for now -->
+                                        </div>
+                                    </div>
+                                    <% } %>
+                            </div>
+                            <% } else { %>
+                                <p class="text-muted">You haven't written any reviews yet.</p>
+                                <% } %>
+        </div>
+    </div>

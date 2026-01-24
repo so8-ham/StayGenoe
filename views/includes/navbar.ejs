@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/listings"><i class="fa-solid fa-compass"></i> StayGenoe</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <!-- Search Bar -->
+            <form class="d-flex mx-auto search-form" role="search" action="/listings" method="GET">
+                <div class="search-container">
+                    <input class="form-control search-input" type="search" name="q" placeholder="Search destinations..."
+                        aria-label="Search" value="<%= typeof query !== 'undefined' ? query : '' %>">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </form>
+
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/listings">Explore</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/listings/new">Add your home</a>
+                <% if(!currentUser) { %>
+                    <a class="nav-link" href="/signup"><b>Sign up</b><i class="fa-solid fa-user-plus"></i></a>
+                    <a class="nav-link" href="/login"><b>Log in</b><i class="fa-solid fa-hotel"></i></a>
+                    <% } %>
+                        <% if(currentUser) { %>
+                            <a class="nav-link" href="/profile">
+                                <% if (currentUser.image && currentUser.image.url) { %>
+                                    <img src="<%= currentUser.image.url %>" alt="Profile" class="rounded-circle"
+                                        style="width: 25px; height: 25px; object-fit: cover; margin-right: 5px;">
+                                    <% } else { %>
+                                        <b>Profile</b> <i class="fa-solid fa-user"></i>
+                                        <% } %>
+                            </a>
+                            <a class="nav-link" href="/logout"><b>Log out</b><i
+                                    class="fa-solid fa-right-from-bracket"></i></a>
+                            <% } %>
+                                <button id="themeToggle" class="btn btn-sm btn-outline-dark ms-3 rounded-circle"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="fa-solid fa-moon"></i>
+                                </button>
+            </div>
+        </div>
+    </div>
+</nav>

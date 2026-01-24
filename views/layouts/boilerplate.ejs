@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StayGenoe</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/rating.css">
+</head>
+
+<body>
+
+  <%- include('../includes/navbar') %>
+
+    <div class="container">
+      <%- include('../includes/flash') %>
+        <%- body %>
+    </div>
+
+    <%- include('../includes/footer') %>
+
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+      <script src="/js/script.js"></script>
+
+      <!-- Chat Bot Widget -->
+      <link rel="stylesheet" href="/css/chat.css">
+
+      <button id="chatBtn" class="chat-btn">
+        <i class="fa-solid fa-robot"></i>
+      </button>
+
+      <div id="chatWindow" class="chat-window">
+        <div class="chat-header">
+          <h5>StayGenoe Assistant</h5>
+          <button id="closeChat" class="close-chat">&times;</button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+          <div class="message bot">
+            Hello! I'm your AI assistant. How can I help you today?
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chatInput" placeholder="Type a message...">
+          <button id="sendMessage" class="send-btn">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+      <script>
+        const chatBtn = document.getElementById('chatBtn');
+        const chatWindow = document.getElementById('chatWindow');
+        const closeChat = document.getElementById('closeChat');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const chatMessages = document.getElementById('chatMessages');
+
+        // Toggle Chat Window
+        chatBtn.addEventListener('click', () => {
+          chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        closeChat.addEventListener('click', () => {
+          chatWindow.style.display = 'none';
+        });
+
+        // Send Message
+        async function handleSendMessage() {
+          const message = chatInput.value.trim();
+          if (!message) return;
+
+          // Append User Message
+          appendMessage(message, 'user');
+          chatInput.value = '';
+          scrollBottom();
+
+          // Show thinking state (optional)
+
+          try {
+            const response = await fetch('/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            if (data.reply) {
+              // Use typing effect for bot
+              appendMessage(data.reply, 'bot', true);
+            } else {
+              appendMessage("Sorry, I didn't get that.", 'bot', true);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            appendMessage("Sorry, something went wrong.", 'bot', true);
+          }
+          // Scroll bottom is handled inside typeText now for bot
+        }
+
+        sendMessage.addEventListener('click', handleSendMessage);
+
+        chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') handleSendMessage();
+        });
+
+        function appendMessage(text, sender, isTyping = false) {
+          const div = document.createElement('div');
+          div.classList.add('message', sender);
+          chatMessages.appendChild(div);
+
+          if (sender === 'bot' && isTyping) {
+            typeText(div, text);
+          } else {
+            div.innerText = text;
+            scrollBottom();
+          }
+        }
+
+        function typeText(element, text) {
+          let index = 0;
+          const interval = setInterval(() => {
+            if (index < text.length) {
+              element.innerText += text.charAt(index);
+              index++;
+              scrollBottom(); // Scroll as it types
+            } else {
+              clearInterval(interval);
+            }
+          }, 30); // Speed of typing in ms
+        }
+
+        function scrollBottom() {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      </script>
+</body>
+
+</html>
