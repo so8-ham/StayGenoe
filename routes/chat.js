@@ -12,7 +12,7 @@ const getAIResponse = async (userMessage) => {
             return "Server Error: API Key is missing. Please check .env file.";
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
         const prompt = `
         You are a helpful and enthusiastic AI assistant for StayGenoe, a premium vacation rental application. 
