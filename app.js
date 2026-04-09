@@ -13,6 +13,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const Listing = require('./models/listing');
 
 const listingRoutes = require("./routes/listings.js");
 const reviewRoutes = require("./routes/reviews.js");
@@ -20,7 +21,7 @@ const userRoutes = require("./routes/users.js");
 const chatRoutes = require("./routes/chat.js");
 
 // Database Connection
-mongoose.connect('mongodb://127.0.0.1:27017/airbnb-clone', {
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -78,8 +79,9 @@ app.use('/listings/:id/reviews', reviewRoutes);
 app.use('/', userRoutes);
 app.use('/chat', chatRoutes);
 
-app.get('/', (req, res) => {
-    res.render('listings/index'); // Temporary, usually home page
+app.get('/', async (req, res) => {
+    const allListings = await Listing.find({});
+    res.render('listings/index', { allListings });
 });
 
 // Error Handling
@@ -93,6 +95,8 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err });
 });
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000');
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 });
